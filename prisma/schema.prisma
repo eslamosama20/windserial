@@ -1,0 +1,41 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model tokens {
+  id         Int       @id @default(autoincrement())
+  token      String
+  is_valid   Boolean?  @default(true)
+  agent      String?
+  expired_at DateTime?
+  created_at DateTime? @default(now())
+  updated_at DateTime? @default(now())
+  user       users?    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId     Int?
+}
+
+model users {
+  id              Int      @id @default(autoincrement())
+  name            String?
+  password        String?
+  email           String   @unique
+  tokens          tokens[]
+  orders          orders[]  // علاقة 1 إلى N بين users و orders
+}
+
+model orders {
+  id           Int      @id @default(autoincrement())
+  referenceId  String   @unique  // معرف الطلب الفريد
+  amount       Float    // المبلغ المدفوع
+  currency     String   // نوع العملة (مثل USD)
+  status       String   // حالة الطلب (مثل Pending أو Completed)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  user         users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int      // معرف المستخدم الذي قام بالطلب
+}

@@ -6,22 +6,9 @@ import Joi from 'joi';
 
 const prisma = new PrismaClient();
 
-// Joi validation schemas
-const signUpSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-  confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
-  name: Joi.string().min(3).required(),
-});
 
-const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required(),
-});
 
 export const signUp = asyncHandler(async (req, res) => {
-  // Validate input using Joi
-  const { error } = signUpSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
@@ -46,8 +33,6 @@ export const signUp = asyncHandler(async (req, res) => {
 });
 
 export const login = asyncHandler(async (req, res) => {
-  // Validate input using Joi
-  const { error } = loginSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
